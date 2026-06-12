@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golden Acre Promoters & Land Developers — CRM Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold: #B8960C; --gold-light: #D4AF37; --gold-pale: #F5ECC7; --gold-muted: #7A6208;
+  --cream: #FDFAF3; --dark: #1A1600; --dark2: #2D2400;
+  --text: #2D2400; --text-muted: #6B5B1E; --text-light: #9A8640;
+  --border: rgba(184,150,12,0.18); --border-strong: rgba(184,150,12,0.35);
+  --surface: #FFFDF5; --surface2: #FBF6E6;
+  --sidebar-w: 248px; --green: #2E7D32; --red: #C62828;
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); display: flex; min-height: 100vh; font-size: 14px; }
+
+/* ── Sidebar ── */
+.sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--dark); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 100; border-right: 1px solid rgba(184,150,12,0.25); }
+.sidebar-logo { padding: 26px 20px 20px; border-bottom: 1px solid rgba(184,150,12,0.2); }
+.logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg,var(--gold),var(--gold-light)); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 17px; color: var(--dark); }
+.logo-name { font-family: 'Playfair Display', serif; color: var(--gold-light); font-size: 13.5px; font-weight: 600; line-height: 1.3; }
+.logo-sub { color: rgba(212,175,55,0.5); font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.2px; margin-top: 2px; }
+.nav { padding: 14px 0; flex: 1; overflow-y: auto; }
+.nav-section { padding: 8px 16px 4px; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(212,175,55,0.35); }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 20px; color: rgba(212,175,55,0.55); cursor: pointer; transition: all .18s; border-left: 3px solid transparent; font-size: 13px; }
+.nav-item:hover { color: var(--gold-light); background: rgba(184,150,12,0.07); }
+.nav-item.active { color: var(--gold-light); background: rgba(184,150,12,0.12); border-left-color: var(--gold); }
+.nav-item i { width: 16px; text-align: center; font-size: 13px; }
+.sidebar-footer { padding: 14px 20px; border-top: 1px solid rgba(184,150,12,0.15); display: flex; align-items: center; gap: 10px; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,var(--gold-muted),var(--gold)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--cream); flex-shrink: 0; }
+.user-name { color: var(--gold-light); font-size: 12px; font-weight: 500; }
+.user-role { color: rgba(212,175,55,0.4); font-size: 10px; }
+
+/* ── Main ── */
+.main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 13px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+.page-title { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 600; color: var(--dark); }
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.topbar-date { font-size: 12px; color: var(--text-muted); }
+.topbar-btn { background: var(--gold); color: var(--dark); border: none; border-radius: 8px; padding: 7px 15px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px; transition: background .15s; }
+.topbar-btn:hover { background: var(--gold-light); }
+.topbar-btn.secondary { background: transparent; border: 1.5px solid var(--gold); color: var(--gold-muted); }
+.topbar-btn.secondary:hover { background: var(--gold-pale); }
+
+/* ── Pages ── */
+.page { display: none; padding: 24px 28px; flex: 1; }
+.page.active { display: block; }
+
+/* ── KPI ── */
+.kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; position: relative; overflow: hidden; transition: box-shadow .2s; }
+.kpi-card:hover { box-shadow: 0 4px 20px rgba(184,150,12,0.12); }
+.kpi-card::before { content:''; position: absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg,var(--gold),var(--gold-light)); opacity:0; transition: opacity .2s; }
+.kpi-card:hover::before { opacity:1; }
+.kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: .8px; color: var(--text-light); margin-bottom: 7px; }
+.kpi-value { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--dark); margin-bottom: 5px; }
+.kpi-sub { font-size: 11px; color: var(--text-light); }
+.kpi-icon { position: absolute; top:16px; right:16px; width:34px; height:34px; background:var(--gold-pale); border-radius:9px; display:flex; align-items:center; justify-content:center; color:var(--gold-muted); font-size:14px; }
+
+/* ── Cards ── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 18px; }
+.card-head { padding: 14px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--dark); }
+.card-body { padding: 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+
+/* ── Table ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
+thead tr { background: var(--surface2); }
+th { text-align: left; padding: 10px 14px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .6px; color: var(--text-light); font-weight: 500; white-space: nowrap; }
+td { padding: 11px 14px; font-size: 12.5px; color: var(--text); border-top: 1px solid var(--border); white-space: nowrap; }
+tr:hover td { background: var(--gold-pale); }
+.badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.badge-green { background: #E8F5E9; color: #2E7D32; }
+.badge-amber { background: #FFF8E1; color: #F57F17; }
+.badge-blue  { background: #E3F2FD; color: #1565C0; }
+.badge-red   { background: #FFEBEE; color: #C62828; }
+.badge-purple{ background: #F3E5F5; color: #6A1B9A; }
+
+/* ── Page Header ── */
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+.page-header h2 { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; }
+.search-bar { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px; padding: 7px 12px; }
+.search-bar input { border: none; background: transparent; outline: none; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); width: 190px; }
+
+/* ── Tbl actions ── */
+.tbl-actions { display: flex; gap: 7px; }
+.tbl-btn { background: transparent; border: 1px solid var(--border-strong); border-radius: 6px; padding: 4px 9px; font-size: 11px; cursor: pointer; color: var(--text-muted); transition: all .15s; }
+.tbl-btn:hover { background: var(--gold-pale); color: var(--gold-muted); border-color: var(--gold); }
+.tbl-btn.danger:hover { background: #FFEBEE; color: #C62828; border-color: #C62828; }
+
+/* ── Modal ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(26,22,0,0.55); z-index: 999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: 16px; width: 620px; max-width: 96vw; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+.modal-head { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--surface); z-index: 2; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--dark); }
+.modal-close { width: 28px; height: 28px; border-radius: 50%; background: var(--surface2); border: none; cursor: pointer; font-size: 15px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; }
+.modal-body { padding: 18px 22px; }
+.modal-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .6px; color: var(--text-light); font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea { background: var(--surface2); border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 11px; font-size: 12.5px; color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; transition: border .15s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
+.form-group textarea { resize: vertical; min-height: 70px; }
+.btn-cancel { background: transparent; border: 1.5px solid var(--border-strong); border-radius: 8px; padding: 8px 18px; font-size: 12.5px; font-weight: 500; cursor: pointer; color: var(--text-muted); font-family: 'DM Sans', sans-serif; }
+.btn-submit { background: var(--gold); color: var(--dark); border: none; border-radius: 8px; padding: 8px 20px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px; }
+.btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+.btn-submit:hover:not(:disabled) { background: var(--gold-light); }
+
+/* ── Settings ── */
+.settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 18px; }
+.settings-card h3 { font-family: 'Playfair Display', serif; font-size: 15px; margin-bottom: 14px; color: var(--dark); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.save-btn { background: var(--gold); color: var(--dark); border: none; border-radius: 8px; padding: 9px 22px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.save-btn:hover { background: var(--gold-light); }
+.api-status { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 4px 11px; border-radius: 20px; margin-left: 10px; }
+.api-status.connected { background: #E8F5E9; color: #2E7D32; }
+.api-status.disconnected { background: #FFEBEE; color: #C62828; }
+.api-status.checking { background: #FFF8E1; color: #F57F17; }
+
+/* ── Bar Chart ── */
+.bar-chart { padding: 14px 18px 8px; }
+.bar-wrap { display: flex; align-items: flex-end; gap: 8px; height: 110px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bar { width: 100%; border-radius: 4px 4px 0 0; background: linear-gradient(180deg,var(--gold-light),var(--gold-muted)); transition: opacity .2s; cursor: default; }
+.bar:hover { opacity: .75; }
+.bar-lbl { font-size: 9.5px; color: var(--text-light); }
+.bar-val { font-size: 9.5px; color: var(--gold-muted); font-weight: 600; }
+
+/* ── Lead rows ── */
+.lead-row { display: flex; align-items: center; gap: 12px; padding: 11px 18px; border-top: 1px solid var(--border); }
+.lead-row:first-child { border-top: none; }
+.lead-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gold-pale); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--gold-muted); flex-shrink: 0; }
+.lead-info { flex: 1; }
+.lead-name { font-size: 13px; font-weight: 500; color: var(--dark); }
+.lead-detail { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.lead-meta { text-align: right; }
+.lead-amount { font-size: 12.5px; font-weight: 600; color: var(--dark); }
+.lead-date { font-size: 11px; color: var(--text-light); margin-top: 1px; }
+
+/* ── Progress ── */
+.progress-row { padding: 12px 18px; border-top: 1px solid var(--border); }
+.progress-row:first-child { border-top: none; }
+.prog-top { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.prog-label { font-size: 12.5px; color: var(--text); font-weight: 500; }
+.prog-pct { font-size: 12.5px; color: var(--gold-muted); font-weight: 600; }
+.prog-track { height: 6px; background: var(--gold-pale); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,var(--gold-muted),var(--gold-light)); }
+
+/* ── Inv grid ── */
+.inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 18px; }
+.inv-box { background: var(--surface2); border-radius: 10px; padding: 12px 14px; border: 1px solid var(--border); }
+.inv-box-label { font-size: 10.5px; color: var(--text-light); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
+.inv-box-val { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; }
+
+/* ── Toast ── */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--dark); color: var(--gold-light); border-radius: 10px; padding: 11px 18px; font-size: 13px; font-weight: 500; z-index: 9999; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); transform: translateY(80px); opacity: 0; transition: all .3s; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.error { background: #C62828; color: #fff; }
+.toast.success { background: #2E7D32; color: #fff; }
+
+/* ── Misc ── */
+.loading-row td { text-align: center; padding: 24px; color: var(--text-light); }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--gold-pale); border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state { text-align: center; padding: 36px 20px; color: var(--text-light); font-size: 13px; }
+.empty-state i { font-size: 28px; opacity: .3; margin-bottom: 8px; display: block; }
+.config-banner { background: #FFF8E1; border: 1.5px solid #F57F17; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 10px; }
+.config-banner i { color: #F57F17; margin-top:2px; }
+.config-banner p { font-size: 12px; color: #5D4037; line-height: 1.6; }
+.config-banner a { color: #B8960C; font-weight: 600; cursor: pointer; }
+
+/* ── Script Box ── */
+pre#scriptCode { background:var(--dark); color:var(--gold-light); padding:14px; border-radius:10px; font-size:11px; overflow-x:auto; white-space:pre-wrap; line-height:1.6; margin-top:12px; }
+
+@media (max-width:1100px) {
+  .kpi-grid { grid-template-columns: repeat(2,1fr); }
+  .two-col { grid-template-columns: 1fr; }
+}
+
+/* ── Login Screen ── */
+#loginScreen {
+  position: fixed; inset: 0; background: var(--dark);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10000; flex-direction: column;
+}
+.login-box {
+  background: var(--surface); border-radius: 20px;
+  padding: 40px 36px; width: 360px; max-width: 96vw;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+}
+.login-logo { text-align: center; margin-bottom: 24px; }
+.login-logo .logo-icon { width: 56px; height: 56px; background: linear-gradient(135deg,var(--gold),var(--gold-light)); border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; color: var(--dark); margin-bottom: 12px; }
+.login-logo h2 { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--dark); }
+.login-logo p { font-size: 11px; color: var(--text-light); margin-top: 3px; }
+.login-role-tabs { display: flex; gap: 6px; margin-bottom: 18px; background: var(--surface2); border-radius: 10px; padding: 4px; }
+.role-tab { flex: 1; text-align: center; padding: 7px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text-light); transition: all .2s; }
+.role-tab.active { background: var(--gold); color: var(--dark); font-weight: 600; }
+.login-err { color: #C62828; font-size: 12px; text-align: center; margin-top: 8px; display: none; }
+
+/* ── Admin Badge ── */
+.admin-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--gold-pale); color: var(--gold-muted); border-radius: 6px; padding: 2px 8px; font-size: 10px; font-weight: 600; margin-left: 6px; }
+.viewer-badge { display: inline-flex; align-items: center; gap: 4px; background: #E3F2FD; color: #1565C0; border-radius: 6px; padding: 2px 8px; font-size: 10px; font-weight: 600; margin-left: 6px; }
+
+/* ── Date Filter Bar ── */
+.date-filter-bar { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 10px; padding: 8px 14px; margin-bottom: 18px; flex-wrap: wrap; }
+.date-filter-bar label { font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: .6px; font-weight: 500; white-space: nowrap; }
+.date-filter-bar input[type=date] { border: 1px solid var(--border-strong); border-radius: 7px; padding: 6px 10px; font-size: 12px; color: var(--text); background: var(--surface2); font-family: 'DM Sans', sans-serif; outline: none; }
+.date-filter-bar input[type=date]:focus { border-color: var(--gold); }
+.date-filter-bar .dfb-sep { color: var(--text-light); font-size: 13px; }
+.dfb-btn { background: var(--gold); color: var(--dark); border: none; border-radius: 7px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: 'DM Sans', sans-serif; }
+.dfb-btn:hover { background: var(--gold-light); }
+.dfb-btn.secondary { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border-strong); }
+.dfb-btn.secondary:hover { background: var(--gold-pale); }
+.dfb-tag { background: var(--gold-pale); color: var(--gold-muted); border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; display: none; align-items: center; gap: 5px; }
+.dfb-tag.show { display: inline-flex; }
+.dfb-tag .remove-filter { cursor: pointer; font-size: 12px; color: var(--gold-muted); }
+
+/* ── Project Name pill on cards ── */
+.project-pill { background: linear-gradient(90deg,var(--gold-muted),var(--gold)); color: white; border-radius: 20px; padding: 2px 10px; font-size: 10px; font-weight: 700; letter-spacing: .5px; display: inline-flex; align-items: center; gap: 4px; }
+
+/* ── Admin-only controls ── */
+.admin-only { display: none; }
+body.is-admin .admin-only { display: inline-flex; }
+body.is-admin .admin-only-block { display: block; }
+.admin-only-block { display: none; }
+
+/* ── User mgmt ── */
+.user-list-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.user-list-item:last-child { border-bottom: none; }
+.user-role-tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.tag-admin { background: var(--gold-pale); color: var(--gold-muted); }
+.tag-viewer { background: #E3F2FD; color: #1565C0; }
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-icon"><i class="fas fa-building"></i></div>
+      <h2>Golden Acre Promoters</h2>
+      <p>& Land Developers — CRM</p>
+    </div>
+    <div class="login-role-tabs">
+      <div class="role-tab active" onclick="switchLoginRole('admin')"><i class="fas fa-user-shield"></i> Admin</div>
+      <div class="role-tab" onclick="switchLoginRole('viewer')"><i class="fas fa-eye"></i> Viewer</div>
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Username</label>
+      <input id="loginUser" placeholder="Enter username" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Password</label>
+      <input id="loginPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-submit" style="width:100%;justify-content:center;padding:11px" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Login</button>
+    <div class="login-err" id="loginErr">❌ Invalid username or password</div>
+    <div style="margin-top:14px;padding:10px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text-light)">
+      <strong>Default Credentials:</strong><br>
+      Admin: admin / admin123 &nbsp;|&nbsp; Viewer: viewer / view123<br>
+      <em>(Change in Settings → User Management)</em>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><i class="fas fa-building"></i></div>
+    <div class="logo-name">Golden Acre<br>Promoters</div>
+    <div class="logo-sub">& Land Developers</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</div>
+    <div class="nav-item" data-page="leads"><i class="fas fa-users"></i> Leads & CRM</div>
+    <div class="nav-item" data-page="plots"><i class="fas fa-map-marked-alt"></i> Plot Inventory</div>
+    <div class="nav-item" data-page="followups"><i class="fas fa-phone-alt"></i> Follow-ups</div>
+    <div class="nav-section" style="margin-top:8px">Finance</div>
+    <div class="nav-item" data-page="bookings"><i class="fas fa-handshake"></i> Bookings & Deals</div>
+    <div class="nav-item" data-page="payments"><i class="fas fa-receipt"></i> Payments</div>
+    <div class="nav-item" data-page="revenue"><i class="fas fa-rupee-sign"></i> Revenue</div>
+    <div class="nav-section" style="margin-top:8px">Admin</div>
+    <div class="nav-item" data-page="settings"><i class="fas fa-cog"></i> Settings</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="avatar" id="sidebarAvatar">AD</div>
+    <div style="flex:1">
+      <div class="user-name" id="sidebarUser">Admin</div>
+      <div class="user-role" id="sidebarRole">Management</div>
+    </div>
+    <i class="fas fa-sign-out-alt" style="color:rgba(212,175,55,0.35);font-size:13px;cursor:pointer" title="Logout" onclick="doLogout()"></i>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title" id="topbarTitle">Overview Dashboard</div>
+      <div id="topbarProject" style="font-size:11px;color:var(--text-light);margin-top:2px;display:none"><i class="fas fa-map-marker-alt" style="color:var(--gold)"></i> <span id="projectNameDisplay">—</span></div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-date"><i class="far fa-calendar-alt"></i> &nbsp;<span id="currentDate"></span></div>
+      <button class="topbar-btn secondary" onclick="refreshAll()"><i class="fas fa-sync-alt"></i> Refresh</button>
+      <button class="topbar-btn admin-only" id="primaryBtn" onclick="openPrimaryModal()"><i class="fas fa-plus"></i> <span id="primaryBtnLabel">Add Lead</span></button>
+    </div>
+  </div>
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div id="page-dashboard" class="page active">
+    <div class="config-banner" id="configBanner" style="display:none">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p><strong>Google Sheets Not Connected</strong> — Enter your Web App URL in <a onclick="goPage('settings')">Settings</a> to load live data.</p>
+    </div>
+
+    <!-- Date Filter Bar -->
+    <div class="date-filter-bar">
+      <label><i class="fas fa-calendar-day"></i> &nbsp;Date Filter</label>
+      <input type="date" id="filterDateFrom" onchange="applyDateFilter()">
+      <span class="dfb-sep">→</span>
+      <input type="date" id="filterDateTo" onchange="applyDateFilter()">
+      <button class="dfb-btn" onclick="applyDateFilter()"><i class="fas fa-filter"></i> Apply</button>
+      <button class="dfb-btn secondary" onclick="clearDateFilter()"><i class="fas fa-times"></i> Clear</button>
+      <span class="dfb-tag" id="activeFilterTag"><i class="fas fa-calendar-check"></i> <span id="activeFilterText"></span> <span class="remove-filter" onclick="clearDateFilter()">✕</span></span>
+      <div style="flex:1"></div>
+      <label style="margin-left:8px"><i class="fas fa-project-diagram"></i> &nbsp;Project</label>
+      <select id="dashProjectFilter" onchange="applyDateFilter()" style="border:1px solid var(--border-strong);border-radius:7px;padding:6px 10px;font-size:12px;background:var(--surface2);color:var(--text);outline:none;min-width:140px">
+        <option value="">All Projects</option>
+      </select>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-users"></i></div><div class="kpi-label">Total Leads</div><div class="kpi-value" id="kpi-leads">—</div><div class="kpi-sub" id="kpi-leads-sub">Active pipeline</div></div>
+      <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-map-pin"></i></div><div class="kpi-label">Plots Available</div><div class="kpi-value" id="kpi-avail">—</div><div class="kpi-sub" id="kpi-avail-sub">Ready to sell</div></div>
+      <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-rupee-sign"></i></div><div class="kpi-label">Total Bookings</div><div class="kpi-value" id="kpi-booking">—</div><div class="kpi-sub" id="kpi-booking-sub">Booking amount received</div></div>
+      <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-label">Plots Sold</div><div class="kpi-value" id="kpi-sold">—</div><div class="kpi-sub" id="kpi-sold-sub">Total sold inventory</div></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head"><span class="card-title">Monthly Revenue (₹ Lakhs)</span><span style="font-size:11px;color:var(--text-light);cursor:pointer" onclick="goPage('revenue')">Full Report →</span></div>
+        <div class="bar-chart"><div class="bar-wrap" id="barChart"></div></div>
+        <div style="padding:0 18px 12px;font-size:11px;color:var(--text-light)"><i class="fas fa-info-circle"></i> Data from "Payments" sheet.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">Plot Inventory Snapshot</span></div>
+        <div class="inv-grid">
+          <div class="inv-box"><div class="inv-box-label">Total Plots</div><div class="inv-box-val" id="inv-total" style="color:var(--dark)">—</div></div>
+          <div class="inv-box"><div class="inv-box-label">Available</div><div class="inv-box-val" id="inv-avail" style="color:#2E7D32">—</div></div>
+          <div class="inv-box"><div class="inv-box-label">Booked</div><div class="inv-box-val" id="inv-booked" style="color:#F57F17">—</div></div>
+          <div class="inv-box"><div class="inv-box-label">Sold</div><div class="inv-box-val" id="inv-sold" style="color:#C62828">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head"><span class="card-title">Recent Leads</span><span style="font-size:11px;color:var(--text-light);cursor:pointer" onclick="goPage('leads')">All Leads →</span></div>
+        <div class="card-body" id="recentLeadsList"><div class="empty-state"><i class="fas fa-users"></i>Loading leads...</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">Today's Follow-ups</span><span style="font-size:11px;color:var(--text-light);cursor:pointer" onclick="goPage('followups')">All →</span></div>
+        <div class="card-body" id="todayFollowups"><div class="empty-state"><i class="fas fa-phone-alt"></i>Loading...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LEADS & CRM ═══ -->
+  <div id="page-leads" class="page">
+    <div class="page-header">
+      <h2>Leads & CRM</h2>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div class="search-bar"><i class="fas fa-search" style="color:var(--text-light)"></i><input id="leadSearch" placeholder="Search name, phone, email..." oninput="filterLeads()"></div>
+        <select id="leadStatusFilter" onchange="filterLeads()" style="border:1px solid var(--border-strong);border-radius:8px;padding:7px 10px;font-size:12px;background:var(--surface);color:var(--text);outline:none">
+          <option value="">All Statuses</option>
+          <option>New Lead</option><option>Interested</option><option>Site Visit Scheduled</option>
+          <option>Site Visit Done</option><option>Negotiating</option><option>Converted</option><option>Lost</option>
+        </select>
+        <select id="leadProjectFilter" onchange="filterLeads()" style="border:1px solid var(--border-strong);border-radius:8px;padding:7px 10px;font-size:12px;background:var(--surface);color:var(--text);outline:none">
+          <option value="">All Projects</option>
+        </select>
+        <button class="topbar-btn admin-only" onclick="openModal('leadModal')"><i class="fas fa-plus"></i> Add Lead</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Sr No.</th><th>Date</th><th>Lead ID</th><th>Lead Source</th>
+            <th>Customer Name</th><th>Contact No.</th><th>Email ID</th>
+            <th>Project</th><th>Lead Status</th><th>Site Visit</th><th>WhatsApp Msg</th>
+            <th>Follow-up Date</th><th>Follow-up Note</th>
+            <th>Client Budget</th><th>Budget Range</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="leadTable"><tr class="loading-row"><td colspan="16"><span class="spinner"></span>Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PLOT INVENTORY ═══ -->
+  <div id="page-plots" class="page">
+    <div class="page-header">
+      <h2>Plot Inventory</h2>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div class="search-bar"><i class="fas fa-search" style="color:var(--text-light)"></i><input id="plotSearch" placeholder="Plot no., facing, size..." oninput="filterTable('plotTable','plotSearch')"></div>
+        <select id="plotStatusFilter" onchange="filterPlots()" style="border:1px solid var(--border-strong);border-radius:8px;padding:7px 10px;font-size:12px;background:var(--surface);color:var(--text);outline:none">
+          <option value="">All Statuses</option>
+          <option>Available</option><option>Reserved</option><option>Booked</option><option>Sold</option>
+        </select>
+        <select id="plotProjectFilter" onchange="filterPlots()" style="border:1px solid var(--border-strong);border-radius:8px;padding:7px 10px;font-size:12px;background:var(--surface);color:var(--text);outline:none">
+          <option value="">All Projects</option>
+        </select>
+        <button class="topbar-btn admin-only" onclick="openModal('plotModal')"><i class="fas fa-plus"></i> Add Plot</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Plot No.</th><th>Plot Facing</th><th>Plot Size (Marla)</th>
+            <th>Base Rate (per Marla)</th><th>Plot Base Price</th>
+            <th>Plot Status</th><th>Agreed Final Rate/Marla</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="plotTable"><tr class="loading-row"><td colspan="8"><span class="spinner"></span>Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ FOLLOW-UPS ═══ -->
+  <div id="page-followups" class="page">
+    <div class="page-header">
+      <h2>Follow-ups</h2>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="search-bar"><i class="fas fa-search" style="color:var(--text-light)"></i><input id="fuSearch" placeholder="Name, phone..." oninput="filterTable('fuTable','fuSearch')"></div>
+        <button class="topbar-btn admin-only" onclick="openModal('fuModal')"><i class="fas fa-plus"></i> Schedule Follow-up</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Customer Name</th><th>Contact No.</th><th>Lead ID</th>
+            <th>Follow-up Date</th><th>Follow-up Note</th><th>Type</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="fuTable"><tr class="loading-row"><td colspan="8"><span class="spinner"></span>Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ BOOKINGS & DEALS ═══ -->
+  <div id="page-bookings" class="page">
+    <div class="page-header">
+      <h2>Bookings & Deals</h2>
+      <button class="topbar-btn admin-only" onclick="openModal('bookingModal')"><i class="fas fa-plus"></i> Add Booking</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Customer Name</th><th>Contact No.</th><th>Plot No.</th>
+            <th>Plot Size (Marla)</th><th>Agreed Final Rate/Marla</th>
+            <th>Booking Amount</th><th>Total Amount</th><th>Balance Amount</th>
+            <th>Plot Status</th><th>Date</th><th>Project</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="bookingTable"><tr class="loading-row"><td colspan="12"><span class="spinner"></span>Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAYMENTS ═══ -->
+  <div id="page-payments" class="page">
+    <div class="page-header">
+      <h2>Payments</h2>
+      <button class="topbar-btn admin-only" onclick="openModal('paymentModal')"><i class="fas fa-plus"></i> Record Payment</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Date</th><th>Customer Name</th><th>Contact No.</th>
+            <th>Plot No.</th><th>Amount (₹)</th><th>Payment Mode</th>
+            <th>Receipt No.</th><th>Remarks</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="paymentTable"><tr class="loading-row"><td colspan="9"><span class="spinner"></span>Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ REVENUE ═══ -->
+  <div id="page-revenue" class="page">
+    <div class="page-header"><h2>Revenue Overview</h2></div>
+    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-rupee-sign"></i></div><div class="kpi-label">Total Revenue</div><div class="kpi-value" id="rev-total">—</div></div>
+      <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-calendar-check"></i></div><div class="kpi-label">This Month</div><div class="kpi-value" id="rev-month">—</div></div>
+      <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-label">Total Balance Pending</div><div class="kpi-value" id="rev-balance">—</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">Payment History</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Customer Name</th><th>Plot No.</th><th>Amount</th><th>Mode</th><th>Receipt No.</th></tr></thead>
+          <tbody id="revenueTable"><tr class="loading-row"><td colspan="6"><span class="spinner"></span>Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SETTINGS ═══ -->
+  <div id="page-settings" class="page">
+    <div class="page-header"><h2>Settings</h2></div>
+
+    <div class="settings-card">
+      <h3><i class="fas fa-link" style="color:var(--gold);margin-right:8px"></i>Google Sheets Connection
+        <span class="api-status disconnected" id="apiStatusBadge"><i class="fas fa-times-circle"></i> Not Connected</span>
+      </h3>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.7;">
+        Paste your Google Apps Script Web App URL below. The script reads and writes data to your Google Sheet. See the <strong>Apps Script Setup</strong> section below for the code and instructions.
+      </p>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Web App URL (Google Apps Script)</label>
+        <input type="url" id="sheetsUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="save-btn" onclick="saveSettings()"><i class="fas fa-save"></i> Save & Test Connection</button>
+        <button class="save-btn" style="background:var(--surface2);color:var(--gold-muted);border:1.5px solid var(--gold)" onclick="testConnection()"><i class="fas fa-plug"></i> Test Only</button>
+      </div>
+    </div>
+
+    <div class="settings-card admin-only-block">
+      <h3><i class="fas fa-project-diagram" style="color:var(--gold);margin-right:8px"></i>Project Management</h3>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Add or remove project names. These appear in all forms and filters.</p>
+      <div id="projectList" style="margin-bottom:14px"></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input id="newProjectName" placeholder="New project name e.g. Golden Acres Phase 2" style="flex:1;border:1px solid var(--border-strong);border-radius:8px;padding:8px 11px;font-size:12.5px;font-family:'DM Sans',sans-serif;background:var(--surface2);outline:none;color:var(--text)">
+        <button class="save-btn" onclick="addProject()"><i class="fas fa-plus"></i> Add Project</button>
+      </div>
+    </div>
+
+    <div class="settings-card admin-only-block">
+      <h3><i class="fas fa-users-cog" style="color:var(--gold);margin-right:8px"></i>User Management</h3>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Manage admin and viewer credentials. Admin can add/edit/delete data. Viewer can only see data.</p>
+      <div id="userList" style="margin-bottom:14px"></div>
+      <div style="background:var(--surface2);border-radius:10px;padding:14px;border:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:600;color:var(--dark);margin-bottom:10px">Add / Update User</div>
+        <div class="form-row">
+          <div class="form-group"><label>Username</label><input id="newUsr" placeholder="e.g. rahul"></div>
+          <div class="form-group"><label>Password</label><input id="newPwd" placeholder="Min 4 characters"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Role</label>
+            <select id="newRole"><option value="admin">Admin (Full Access)</option><option value="viewer">Viewer (Read Only)</option></select>
+          </div>
+          <div class="form-group"><label>Display Name</label><input id="newDisplayName" placeholder="Full name"></div>
+        </div>
+        <button class="save-btn" onclick="saveUser()"><i class="fas fa-user-plus"></i> Save User</button>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h3><i class="fas fa-building" style="color:var(--gold);margin-right:8px"></i>Company Info</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Company Name</label><input id="compName" value="Golden Acre Promoters"></div>
+        <div class="form-group"><label>Admin Name</label><input id="adminName" value="Admin"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone</label><input id="compPhone" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="form-group"><label>Email</label><input id="compEmail" placeholder="info@goldenacre.in"></div>
+      </div>
+      <button class="save-btn" onclick="saveCompanyInfo()">Save Info</button>
+    </div>
+
+    <div class="settings-card">
+      <h3><i class="fas fa-file-code" style="color:var(--gold);margin-right:8px"></i>Google Sheets — Required Sheet Structure</h3>
+      <p style="font-size:12px;color:var(--text-muted);line-height:1.8;margin-bottom:14px">
+        Create the following sheets (tabs) in your Google Sheet with <strong>exact column headers</strong> as shown:
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;border:1px solid var(--border);font-size:11px"><strong>Leads</strong><br><span style="color:var(--text-light)">SR NO., DATE, LEAD ID, LEAD SOURCE, CUSTOMER NAME, CONTACT NO., EMAIL ID, <strong style="color:var(--gold-muted)">PROJECT NAME</strong>, LEAD STATUS, SITE VISIT, WHATSAPP MSG, FOLLOW UP DATE, FOLLOW UP NOTE, CLIENT BUDGET, BUDGET RANGE</span></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;border:1px solid var(--border);font-size:11px"><strong>Plots</strong><br><span style="color:var(--text-light)">PLOT NO., PLOT FACING, PLOT SIZE (MARLA), BASE RATE (PER MARLA), PLOT BASE PRICE, PLOT STATUS, AGREED FINAL RATE PER MARLA</span></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;border:1px solid var(--border);font-size:11px"><strong>Bookings</strong><br><span style="color:var(--text-light)">CUSTOMER NAME, CONTACT NO., PLOT NO., PLOT SIZE (MARLA), AGREED FINAL RATE PER MARLA, BOOKING AMOUNT, TOTAL AMOUNT, BALANCE AMOUNT, PLOT STATUS, DATE, <strong style="color:var(--gold-muted)">PROJECT NAME</strong></span></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;border:1px solid var(--border);font-size:11px"><strong>Followups</strong><br><span style="color:var(--text-light)">CUSTOMER NAME, CONTACT NO., LEAD ID, FOLLOW UP DATE, FOLLOW UP NOTE, TYPE, STATUS</span></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;border:1px solid var(--border);font-size:11px"><strong>Payments</strong><br><span style="color:var(--text-light)">DATE, CUSTOMER NAME, CONTACT NO., PLOT NO., AMOUNT, PAYMENT MODE, RECEIPT NO., REMARKS</span></div>
+      </div>
+      <button class="save-btn" onclick="copyScript()" style="font-size:12px;padding:8px 16px"><i class="fas fa-copy"></i> Copy Apps Script Code</button>
+      <div id="scriptBox" style="display:none">
+        <pre id="scriptCode"></pre>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- Lead Modal -->
+<div class="modal-overlay" id="leadModal">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">Add / Edit Lead</span><button class="modal-close" onclick="closeModal('leadModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>SR No.</label><input id="l_srno" placeholder="Auto-filled or enter"></div>
+        <div class="form-group"><label>Date *</label><input id="l_date" type="date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Lead ID</label><input id="l_leadid" placeholder="e.g. GA-001"></div>
+        <div class="form-group"><label>Lead Source</label>
+          <select id="l_source"><option>Walk-in</option><option>Referral</option><option>Facebook</option><option>Instagram</option><option>Website</option><option>JustDial</option><option>99acres</option><option>Exhibition</option><option>Other</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Project Name</label>
+          <select id="l_project"><option value="">-- Select Project --</option></select>
+        </div>
+        <div class="form-group"><label>Customer Name *</label><input id="l_name" placeholder="Full name"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Contact No. *</label><input id="l_phone" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="form-group"><label>Email ID</label><input id="l_email" placeholder="email@example.com" type="email"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Lead Status</label>
+          <select id="l_status"><option>New Lead</option><option>Interested</option><option>Site Visit Scheduled</option><option>Site Visit Done</option><option>Negotiating</option><option>Converted</option><option>Lost</option></select>
+        </div>
+        <div class="form-group"><label>Site Visit</label>
+          <select id="l_sitevisit"><option>No</option><option>Scheduled</option><option>Done</option><option>Not Interested</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>WhatsApp Msg Sent</label>
+          <select id="l_whatsapp"><option>No</option><option>Yes — Sent</option><option>Delivered</option><option>Read</option></select>
+        </div>
+        <div class="form-group"><label>Follow-up Date</label><input id="l_fudate" type="date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Follow-up Note</label><input id="l_funote" placeholder="Brief note about follow-up"></div>
+        <div class="form-group"><label>Client Budget (₹)</label><input id="l_budget" type="number" placeholder="e.g. 5000000"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Budget Range</label>
+          <select id="l_budrange"><option>Below 10 Lakh</option><option>10–25 Lakh</option><option>25–50 Lakh</option><option>50 Lakh–1 Cr</option><option>1 Cr+</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('leadModal')">Cancel</button>
+      <button class="btn-submit" onclick="submitForm('lead')"><i class="fas fa-save"></i> Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- Plot Modal -->
+<div class="modal-overlay" id="plotModal">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">Add / Edit Plot</span><button class="modal-close" onclick="closeModal('plotModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Plot No. *</label><input id="p_plotno" placeholder="e.g. A-12, B-07"></div>
+        <div class="form-group"><label>Plot Facing</label>
+          <select id="p_facing"><option>East</option><option>West</option><option>North</option><option>South</option><option>North-East</option><option>North-West</option><option>South-East</option><option>South-West</option><option>Corner</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Plot Size (Marla) *</label><input id="p_size" type="number" step="0.5" placeholder="e.g. 5, 7, 10"></div>
+        <div class="form-group"><label>Base Rate (per Marla ₹) *</label><input id="p_baserate" type="number" placeholder="e.g. 800000"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Plot Base Price (₹) — Auto</label><input id="p_baseprice" type="number" placeholder="Size × Base Rate" readonly style="background:#eee"></div>
+        <div class="form-group"><label>Plot Status</label>
+          <select id="p_status"><option>Available</option><option>Reserved</option><option>Booked</option><option>Sold</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Agreed Final Rate per Marla (₹)</label><input id="p_finalrate" type="number" placeholder="Negotiated rate"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('plotModal')">Cancel</button>
+      <button class="btn-submit" onclick="submitForm('plot')"><i class="fas fa-save"></i> Save Plot</button>
+    </div>
+  </div>
+</div>
+
+<!-- Follow-up Modal -->
+<div class="modal-overlay" id="fuModal">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">Schedule Follow-up</span><button class="modal-close" onclick="closeModal('fuModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Customer Name *</label><input id="fu_name" placeholder="Full name"></div>
+        <div class="form-group"><label>Contact No. *</label><input id="fu_phone" placeholder="+91 XXXXX XXXXX"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Lead ID</label><input id="fu_leadid" placeholder="e.g. GA-001"></div>
+        <div class="form-group"><label>Follow-up Date *</label><input id="fu_date" type="date"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px"><label>Follow-up Note</label><textarea id="fu_note" placeholder="Notes about this follow-up..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Type</label>
+          <select id="fu_type"><option>Call</option><option>WhatsApp</option><option>Site Visit</option><option>Meeting</option><option>Email</option></select>
+        </div>
+        <div class="form-group"><label>Status</label>
+          <select id="fu_status"><option>Scheduled</option><option>Done</option><option>Rescheduled</option><option>Cancelled</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('fuModal')">Cancel</button>
+      <button class="btn-submit" onclick="submitForm('followup')"><i class="fas fa-save"></i> Save Follow-up</button>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">Add Booking / Deal</span><button class="modal-close" onclick="closeModal('bookingModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Customer Name *</label><input id="b_name" placeholder="Full name"></div>
+        <div class="form-group"><label>Contact No. *</label><input id="b_phone" placeholder="+91 XXXXX XXXXX"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Plot No. *</label><input id="b_plotno" placeholder="e.g. A-12"></div>
+        <div class="form-group"><label>Plot Size (Marla) *</label><input id="b_size" type="number" step="0.5" placeholder="e.g. 5" oninput="calcBookingTotal()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Agreed Final Rate per Marla (₹) *</label><input id="b_finalrate" type="number" placeholder="e.g. 850000" oninput="calcBookingTotal()"></div>
+        <div class="form-group"><label>Total Amount (₹) — Auto</label><input id="b_total" type="number" placeholder="Size × Rate" readonly style="background:#eee"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Booking Amount (₹) *</label><input id="b_booking" type="number" placeholder="Token / advance" oninput="calcBookingTotal()"></div>
+        <div class="form-group"><label>Balance Amount (₹) — Auto</label><input id="b_balance" type="number" placeholder="Total − Booking" readonly style="background:#eee"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Plot Status</label>
+          <select id="b_status"><option>Booked</option><option>Sold</option><option>Reserved</option></select>
+        </div>
+        <div class="form-group"><label>Date *</label><input id="b_date" type="date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Project Name</label>
+          <select id="b_project"><option value="">-- Select Project --</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('bookingModal')">Cancel</button>
+      <button class="btn-submit" onclick="submitForm('booking')"><i class="fas fa-save"></i> Save Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">Record Payment</span><button class="modal-close" onclick="closeModal('paymentModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Date *</label><input id="pay_date" type="date"></div>
+        <div class="form-group"><label>Customer Name *</label><input id="pay_name" placeholder="Full name"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Contact No.</label><input id="pay_phone" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="form-group"><label>Plot No.</label><input id="pay_plot" placeholder="e.g. A-12"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Amount (₹) *</label><input id="pay_amount" type="number" placeholder="e.g. 500000"></div>
+        <div class="form-group"><label>Payment Mode</label>
+          <select id="pay_mode"><option>Cash</option><option>Cheque</option><option>NEFT/RTGS</option><option>UPI</option><option>Demand Draft</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Receipt No.</label><input id="pay_receipt" placeholder="e.g. REC-001"></div>
+        <div class="form-group"><label>Remarks</label><input id="pay_remarks" placeholder="Optional note"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('paymentModal')">Cancel</button>
+      <button class="btn-submit" onclick="submitForm('payment')"><i class="fas fa-save"></i> Save Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════
+let SHEET_URL = localStorage.getItem('ga_sheet_url') || '';
+let cache = {};
+
+// ── Active date filter state ──
+let activeDateFilter = { from: '', to: '' };
+let activeProjectFilter = '';
+
+// ═══════════════════════════════════════
+//  AUTH — LOGIN SYSTEM
+// ═══════════════════════════════════════
+let currentUser = null;
+let loginRole = 'admin';
+
+function getUsers() {
+  try {
+    const u = JSON.parse(localStorage.getItem('ga_users') || '[]');
+    if (!u.length) return [
+      { username: 'admin',  password: 'admin123',  role: 'admin',  displayName: 'Admin' },
+      { username: 'viewer', password: 'view123',   role: 'viewer', displayName: 'Viewer' }
+    ];
+    return u;
+  } catch(e) {
+    return [
+      { username: 'admin',  password: 'admin123',  role: 'admin',  displayName: 'Admin' },
+      { username: 'viewer', password: 'view123',   role: 'viewer', displayName: 'Viewer' }
+    ];
+  }
+}
+
+function saveUsers(users) {
+  localStorage.setItem('ga_users', JSON.stringify(users));
+}
+
+function switchLoginRole(role) {
+  loginRole = role;
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.role-tab[onclick*="${role}"]`).classList.add('active');
+}
+
+function doLogin() {
+  const usr = document.getElementById('loginUser').value.trim();
+  const pwd = document.getElementById('loginPass').value.trim();
+  const users = getUsers();
+  const match = users.find(u => u.username === usr && u.password === pwd && u.role === loginRole);
+  if (match) {
+    currentUser = match;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('loginErr').style.display = 'none';
+    applyUserRole();
+    initDashboard();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  if (!confirm('Logout karna chahte hain?')) return;
+  currentUser = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+function applyUserRole() {
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  if (isAdmin) {
+    document.body.classList.add('is-admin');
+  } else {
+    document.body.classList.remove('is-admin');
+  }
+  document.getElementById('sidebarUser').textContent = currentUser ? currentUser.displayName : 'User';
+  document.getElementById('sidebarAvatar').textContent = (currentUser ? currentUser.displayName : 'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('sidebarRole').textContent = isAdmin ? 'Admin — Full Access' : 'Viewer — Read Only';
+}
+
+// User management functions
+function renderUserList() {
+  const users = getUsers();
+  const el = document.getElementById('userList');
+  if (!el) return;
+  el.innerHTML = users.map((u, i) => `
+    <div class="user-list-item">
+      <div class="avatar" style="width:30px;height:30px;font-size:11px">${u.displayName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500;color:var(--dark)">${u.displayName} <span style="color:var(--text-light);font-size:11px">@${u.username}</span></div>
+        <span class="user-role-tag ${u.role==='admin'?'tag-admin':'tag-viewer'}">${u.role==='admin'?'Admin':'Viewer'}</span>
+      </div>
+      ${(users.length > 1 && u.username !== (currentUser?.username)) ? `<button class="tbl-btn danger" onclick="deleteUser(${i})"><i class="fas fa-trash"></i></button>` : '<span style="font-size:11px;color:var(--text-light)">Active</span>'}
+    </div>`).join('');
+}
+
+function saveUser() {
+  const usr = document.getElementById('newUsr').value.trim();
+  const pwd = document.getElementById('newPwd').value.trim();
+  const role = document.getElementById('newRole').value;
+  const display = document.getElementById('newDisplayName').value.trim() || usr;
+  if (!usr || !pwd) { showToast('Username aur Password zaroori hain', 'error'); return; }
+  if (pwd.length < 4) { showToast('Password kam se kam 4 characters ka hona chahiye', 'error'); return; }
+  const users = getUsers();
+  const idx = users.findIndex(u => u.username === usr);
+  if (idx >= 0) users[idx] = { username: usr, password: pwd, role, displayName: display };
+  else users.push({ username: usr, password: pwd, role, displayName: display });
+  saveUsers(users);
+  renderUserList();
+  document.getElementById('newUsr').value = '';
+  document.getElementById('newPwd').value = '';
+  document.getElementById('newDisplayName').value = '';
+  showToast(`User "${display}" saved!`, 'success');
+}
+
+function deleteUser(i) {
+  const users = getUsers();
+  if (!confirm(`Delete user "${users[i].displayName}"?`)) return;
+  users.splice(i, 1);
+  saveUsers(users);
+  renderUserList();
+  showToast('User deleted', 'success');
+}
+
+// ═══════════════════════════════════════
+//  PROJECT MANAGEMENT
+// ═══════════════════════════════════════
+function getProjects() {
+  try {
+    return JSON.parse(localStorage.getItem('ga_projects') || '["Golden Acre Phase 1"]');
+  } catch(e) { return ['Golden Acre Phase 1']; }
+}
+
+function saveProjects(p) {
+  localStorage.setItem('ga_projects', JSON.stringify(p));
+}
+
+function addProject() {
+  const name = document.getElementById('newProjectName').value.trim();
+  if (!name) { showToast('Project naam daalo', 'error'); return; }
+  const p = getProjects();
+  if (p.includes(name)) { showToast('Ye project pehle se hai', 'error'); return; }
+  p.push(name);
+  saveProjects(p);
+  renderProjectList();
+  populateProjectSelects();
+  document.getElementById('newProjectName').value = '';
+  showToast(`Project "${name}" add ho gaya!`, 'success');
+}
+
+function deleteProject(i) {
+  const p = getProjects();
+  if (!confirm(`Delete project "${p[i]}"?`)) return;
+  p.splice(i, 1);
+  saveProjects(p);
+  renderProjectList();
+  populateProjectSelects();
+  showToast('Project deleted', 'success');
+}
+
+function renderProjectList() {
+  const p = getProjects();
+  const el = document.getElementById('projectList');
+  if (!el) return;
+  if (!p.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text-light)">Koi project nahi hai. Neeche add karo.</div>'; return; }
+  el.innerHTML = p.map((name, i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <i class="fas fa-project-diagram" style="color:var(--gold);font-size:12px"></i>
+      <span style="flex:1;font-size:13px;font-weight:500">${name}</span>
+      <button class="tbl-btn danger" onclick="deleteProject(${i})"><i class="fas fa-trash"></i></button>
+    </div>`).join('');
+}
+
+function populateProjectSelects() {
+  const projects = getProjects();
+  const opts = '<option value="">-- Select Project --</option>' + projects.map(p=>`<option>${p}</option>`).join('');
+  const filterOpts = '<option value="">All Projects</option>' + projects.map(p=>`<option>${p}</option>`).join('');
+  // Form selects
+  ['l_project','b_project'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = opts;
+  });
+  // Filter selects
+  ['dashProjectFilter','leadProjectFilter','plotProjectFilter'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = filterOpts;
+  });
+  // Topbar project display
+  const pn = localStorage.getItem('ga_active_project') || '';
+  updateProjectDisplay(pn);
+}
+
+function updateProjectDisplay(name) {
+  const el = document.getElementById('topbarProject');
+  const sp = document.getElementById('projectNameDisplay');
+  if (el && sp) {
+    if (name) { sp.textContent = name; el.style.display = 'block'; }
+    else { el.style.display = 'none'; }
+  }
+}
+
+// ═══════════════════════════════════════
+//  DATE FILTER
+// ═══════════════════════════════════════
+function applyDateFilter() {
+  const from = document.getElementById('filterDateFrom').value;
+  const to   = document.getElementById('filterDateTo').value;
+  const proj = document.getElementById('dashProjectFilter').value;
+  activeDateFilter = { from, to };
+  activeProjectFilter = proj;
+
+  // Update active tag
+  const tag = document.getElementById('activeFilterTag');
+  const txt = document.getElementById('activeFilterText');
+  if (from || to || proj) {
+    let label = '';
+    if (from && to) label = `${formatDisplayDate(from)} – ${formatDisplayDate(to)}`;
+    else if (from) label = `From ${formatDisplayDate(from)}`;
+    else if (to) label = `Till ${formatDisplayDate(to)}`;
+    if (proj) label = label ? label + ' · ' + proj : proj;
+    txt.textContent = label;
+    tag.classList.add('show');
+  } else {
+    tag.classList.remove('show');
+  }
+
+  // Update topbar project
+  updateProjectDisplay(proj);
+  localStorage.setItem('ga_active_project', proj);
+
+  // Reload dashboard with filter
+  cache = {};
+  loadDashboard();
+}
+
+function clearDateFilter() {
+  document.getElementById('filterDateFrom').value = '';
+  document.getElementById('filterDateTo').value = '';
+  document.getElementById('dashProjectFilter').value = '';
+  activeDateFilter = { from: '', to: '' };
+  activeProjectFilter = '';
+  document.getElementById('activeFilterTag').classList.remove('show');
+  updateProjectDisplay('');
+  localStorage.setItem('ga_active_project', '');
+  cache = {};
+  loadDashboard();
+}
+
+function formatDisplayDate(d) {
+  if (!d) return '';
+  const [y,m,day] = d.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${day} ${months[parseInt(m)-1]} ${y}`;
+}
+
+function dateInRange(dateStr) {
+  if (!activeDateFilter.from && !activeDateFilter.to) return true;
+  // Parse dd/MM/yyyy or yyyy-MM-dd
+  let d;
+  if (dateStr && dateStr.includes('/')) {
+    const parts = dateStr.split('/');
+    if (parts.length === 3) d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+  } else {
+    d = new Date(dateStr);
+  }
+  if (!d || isNaN(d)) return true;
+  const ds = d.toISOString().split('T')[0];
+  if (activeDateFilter.from && ds < activeDateFilter.from) return false;
+  if (activeDateFilter.to && ds > activeDateFilter.to) return false;
+  return true;
+}
+
+function filterByProject(rows, projectKey) {
+  if (!activeProjectFilter) return rows;
+  return rows.filter(r => (r[projectKey] || r['PROJECT'] || r['Project'] || '') === activeProjectFilter);
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+function initDashboard() {
+  document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  if(SHEET_URL) document.getElementById('sheetsUrl').value = SHEET_URL;
+  if(localStorage.getItem('ga_comp_name')) document.getElementById('compName').value = localStorage.getItem('ga_comp_name');
+  if(localStorage.getItem('ga_admin_name')) document.getElementById('adminName').value = localStorage.getItem('ga_admin_name');
+
+  document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+    item.addEventListener('click', () => goPage(item.dataset.page));
+  });
+
+  // Auto-calc base price
+  ['p_size','p_baserate'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('input', () => {
+      const s = parseFloat(document.getElementById('p_size').value)||0;
+      const r = parseFloat(document.getElementById('p_baserate').value)||0;
+      document.getElementById('p_baseprice').value = s && r ? s*r : '';
+    });
+  });
+
+  // Init project selects
+  populateProjectSelects();
+  renderProjectList();
+  renderUserList();
+
+  goPage('dashboard');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Show login screen, don't init dashboard yet
+});
+
+// ═══════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════
+const pageTitles = {
+  dashboard:'Overview Dashboard', leads:'Leads & CRM', plots:'Plot Inventory',
+  followups:'Follow-ups', bookings:'Bookings & Deals', payments:'Payments',
+  revenue:'Revenue', settings:'Settings'
+};
+const primaryBtnMap = {
+  dashboard:'Add Lead', leads:'Add Lead', plots:'Add Plot',
+  followups:'Schedule Follow-up', bookings:'Add Booking', payments:'Record Payment',
+  revenue:'', settings:''
+};
+
+function goPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pg = document.getElementById('page-'+name);
+  if(pg) pg.classList.add('active');
+  const nav = document.querySelector(`.nav-item[data-page="${name}"]`);
+  if(nav) nav.classList.add('active');
+  document.getElementById('topbarTitle').textContent = pageTitles[name] || name;
+  const lbl = primaryBtnMap[name];
+  const btn = document.getElementById('primaryBtn');
+  if(lbl && currentUser?.role === 'admin') { btn.style.display='flex'; document.getElementById('primaryBtnLabel').textContent=lbl; }
+  else btn.style.display='none';
+  if(name === 'settings') { renderProjectList(); renderUserList(); populateProjectSelects(); }
+  loadPageData(name);
+}
+
+function openPrimaryModal() {
+  const pg = document.querySelector('.nav-item.active')?.dataset.page || 'dashboard';
+  const map = {dashboard:'leadModal',leads:'leadModal',plots:'plotModal',followups:'fuModal',bookings:'bookingModal',payments:'paymentModal'};
+  if(map[pg]) openModal(map[pg]);
+}
+
+// ═══════════════════════════════════════
+//  API — JSONP fetch
+// ═══════════════════════════════════════
+async function fetchSheet(sheet) {
+  if(!SHEET_URL) { showConfigBanner(); return null; }
+  if(cache[sheet]) return cache[sheet];
+  return new Promise(resolve => {
+    const cbName = 'cb_'+sheet.replace(/\W/g,'')+'_'+Date.now();
+    const script = document.createElement('script');
+    const url = SHEET_URL+'?sheet='+encodeURIComponent(sheet)+'&callback='+cbName+'&_='+Date.now();
+    let done = false;
+    window[cbName] = data => {
+      done=true; delete window[cbName]; document.body.removeChild(script);
+      if(Array.isArray(data)) { cache[sheet]=data; resolve(data); }
+      else resolve(null);
+    };
+    script.src = url;
+    script.onerror = () => { if(!done){done=true;delete window[cbName];resolve(null);showToast('Failed to load: '+sheet,'error');} };
+    setTimeout(()=>{ if(!done){done=true;delete window[cbName];resolve(null);showToast('Timeout: '+sheet,'error');} },10000);
+    document.body.appendChild(script);
+  });
+}
+
+async function postToSheet(sheet, rowData, action) {
+  if(!SHEET_URL) { showToast('Connect Google Sheets in Settings first!','error'); return false; }
+  try {
+    const body = JSON.stringify({ action: action || 'add', sheet: sheet, data: rowData });
+    const res  = await fetch(SHEET_URL, {
+      method : 'POST',
+      headers: { 'Content-Type': 'text/plain' },  // text/plain avoids CORS preflight
+      body   : body
+    });
+    const text = await res.text();
+    // Response may be plain JSON or JSONP-wrapped — strip wrapper if present
+    const clean = text.replace(/^[a-zA-Z_$][a-zA-Z0-9_$]*\(/, '').replace(/\)$/, '').trim();
+    const json  = JSON.parse(clean);
+    return json && json.success !== false;
+  } catch(err) {
+    console.error('postToSheet error:', err);
+    showToast('Save failed: ' + err.message, 'error');
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════
+//  LOAD PAGE DATA
+// ═══════════════════════════════════════
+async function loadPageData(page) {
+  if(!SHEET_URL) { showConfigBanner(); return; }
+  document.getElementById('configBanner').style.display='none';
+  switch(page) {
+    case 'dashboard':  await loadDashboard(); break;
+    case 'leads':      await loadTable('Leads','leadTable',renderLeadRow); break;
+    case 'plots':      await loadTable('Plots','plotTable',renderPlotRow); break;
+    case 'followups':  await loadTable('Followups','fuTable',renderFuRow); break;
+    case 'bookings':   await loadTable('Bookings','bookingTable',renderBookingRow); break;
+    case 'payments':   await loadTable('Payments','paymentTable',renderPaymentRow); break;
+    case 'revenue':    await loadRevenue(); break;
+  }
+}
+
+async function loadDashboard() {
+  const [leads, plots, payments, bookings] = await Promise.all([
+    fetchSheet('Leads'), fetchSheet('Plots'), fetchSheet('Payments'), fetchSheet('Bookings')
+  ]);
+
+  // Apply filters
+  const fLeads    = leads    ? leads.filter(r => dateInRange(r['DATE']||r['Date']||'')).filter(r => !activeProjectFilter || (r['PROJECT NAME']||r['Project Name']||'') === activeProjectFilter) : [];
+  const fPayments = payments ? payments.filter(r => dateInRange(r['DATE']||r['Date']||'')) : [];
+  const fBookings = bookings ? bookings.filter(r => !activeProjectFilter || (r['PROJECT NAME']||r['Project Name']||'') === activeProjectFilter) : [];
+  const usePlots  = plots || [];
+
+  if(leads) {
+    document.getElementById('kpi-leads').textContent = fLeads.length;
+    document.getElementById('kpi-leads-sub').textContent = fLeads.filter(r=>!['Converted','Lost'].includes(r['LEAD STATUS'])).length+' active';
+  }
+  if(plots) {
+    const avail = usePlots.filter(r=>(r['PLOT STATUS']||r['Plot Status']||'').toLowerCase()==='available').length;
+    const booked = usePlots.filter(r=>['booked','reserved'].includes((r['PLOT STATUS']||r['Plot Status']||'').toLowerCase())).length;
+    const sold = usePlots.filter(r=>(r['PLOT STATUS']||r['Plot Status']||'').toLowerCase()==='sold').length;
+    document.getElementById('kpi-avail').textContent = avail;
+    document.getElementById('kpi-sold').textContent = sold;
+    document.getElementById('inv-total').textContent = usePlots.length;
+    document.getElementById('inv-avail').textContent = avail;
+    document.getElementById('inv-booked').textContent = booked;
+    document.getElementById('inv-sold').textContent = sold;
+  }
+  if(bookings) {
+    const totalBooking = fBookings.reduce((s,r)=>s+(parseFloat(r['BOOKING AMOUNT']||r['Booking Amount'])||0),0);
+    document.getElementById('kpi-booking').textContent = '₹'+formatLakh(totalBooking);
+  }
+  if(payments) buildBarChart(fPayments);
+
+  // Recent leads
+  if(leads) {
+    const el = document.getElementById('recentLeadsList');
+    const recent = fLeads.slice(-6).reverse();
+    el.innerHTML = recent.length ? recent.map(c=>`
+      <div class="lead-row">
+        <div class="lead-avatar">${initials(c['CUSTOMER NAME'])}</div>
+        <div class="lead-info">
+          <div class="lead-name">${c['CUSTOMER NAME']||'—'}</div>
+          <div class="lead-detail">${c['LEAD SOURCE']||''} &nbsp;•&nbsp; ${c['PROJECT NAME']||c['BUDGET RANGE']||c['CLIENT BUDGET']||''}</div>
+        </div>
+        <div class="lead-meta">
+          <div class="lead-amount">${statusBadge(c['LEAD STATUS'])}</div>
+          <div class="lead-date">${c['DATE']||''}</div>
+        </div>
+      </div>`).join('') : '<div class="empty-state"><i class="fas fa-users"></i>No leads yet.</div>';
+  }
+
+  // Today's follow-ups (show selected date or today)
+  const filterDate = activeDateFilter.from || new Date().toISOString().split('T')[0];
+  if(leads) {
+    const todayFU = leads.filter(r => {
+      const fuDate = r['FOLLOW UP DATE'] || '';
+      const norm = fuDate.includes('/') ? fuDate.split('/').reverse().join('-') : fuDate;
+      return norm === filterDate || norm.startsWith(filterDate);
+    });
+    const el = document.getElementById('todayFollowups');
+    const label = activeDateFilter.from ? formatDisplayDate(activeDateFilter.from) : 'Today';
+    el.innerHTML = todayFU.length ? todayFU.map(c=>`
+      <div class="lead-row">
+        <div class="lead-avatar">${initials(c['CUSTOMER NAME'])}</div>
+        <div class="lead-info">
+          <div class="lead-name">${c['CUSTOMER NAME']||'—'}</div>
+          <div class="lead-detail">${c['FOLLOW UP NOTE']||'No note'}</div>
+        </div>
+        <div class="lead-meta"><div class="lead-amount">${c['CONTACT NO.']||c['CONTACT NO']||''}</div></div>
+      </div>`).join('') : `<div class="empty-state"><i class="fas fa-check"></i>No follow-ups for ${label}.</div>`;
+  }
+}
+
+function buildBarChart(payments) {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const rev = new Array(12).fill(0);
+  payments.forEach(p => {
+    const d = new Date(p['DATE']||p['Date']||'');
+    if(!isNaN(d)) rev[d.getMonth()] += (parseFloat(p['AMOUNT']||p['Amount'])||0)/100000;
+  });
+  const maxVal = Math.max(...rev,1);
+  document.getElementById('barChart').innerHTML = months.map((m,i)=>{
+    const h = Math.max(4,(rev[i]/maxVal)*100);
+    return `<div class="bar-col">
+      <div class="bar-val">${rev[i]>0?rev[i].toFixed(1):'—'}</div>
+      <div class="bar" style="height:${h}px" title="${m}: ₹${rev[i].toFixed(1)}L"></div>
+      <div class="bar-lbl">${m}</div>
+    </div>`;
+  }).join('');
+}
+
+async function loadTable(sheet, tbodyId, rowFn) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="20"><span class="spinner"></span>Loading...</td></tr>';
+  const data = await fetchSheet(sheet);
+  if(!data||!data.length) { tbody.innerHTML='<tr><td colspan="20"><div class="empty-state"><i class="fas fa-inbox"></i>No data found. Add a new entry.</div></td></tr>'; return; }
+  tbody.innerHTML = data.map((row,i)=>rowFn(row,i)).join('');
+}
+
+async function loadRevenue() {
+  const [payments, bookings] = await Promise.all([fetchSheet('Payments'),fetchSheet('Bookings')]);
+  if(payments) {
+    const total = payments.reduce((s,r)=>s+(parseFloat(r['AMOUNT']||r['Amount'])||0),0);
+    const now = new Date();
+    const thisMonth = payments.filter(p=>{const d=new Date(p['DATE']||p['Date']||'');return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce((s,r)=>s+(parseFloat(r['AMOUNT']||r['Amount'])||0),0);
+    document.getElementById('rev-total').textContent='₹'+formatLakh(total);
+    document.getElementById('rev-month').textContent='₹'+formatLakh(thisMonth);
+    const tbody = document.getElementById('revenueTable');
+    tbody.innerHTML = payments.slice().reverse().map(p=>`
+      <tr><td>${p['DATE']||p['Date']||'—'}</td><td>${p['CUSTOMER NAME']||p['Customer Name']||'—'}</td>
+      <td>${p['PLOT NO.']||p['Plot No']||'—'}</td><td><strong>₹${formatLakh(p['AMOUNT']||p['Amount'])}</strong></td>
+      <td>${p['PAYMENT MODE']||p['Payment Mode']||'—'}</td><td>${p['RECEIPT NO.']||p['Receipt No']||'—'}</td></tr>`).join('');
+  }
+  if(bookings) {
+    const totalBal = bookings.reduce((s,r)=>s+(parseFloat(r['BALANCE AMOUNT']||r['Balance Amount'])||0),0);
+    document.getElementById('rev-balance').textContent='₹'+formatLakh(totalBal);
+  }
+}
+
+// ═══════════════════════════════════════
+//  ROW RENDERERS
+// ═══════════════════════════════════════
+const statusBadge = s => {
+  const map = {
+    'Available':'green','Sold':'red','Booked':'amber','Reserved':'blue',
+    'New Lead':'blue','Interested':'amber','Site Visit Scheduled':'amber',
+    'Site Visit Done':'amber','Negotiating':'amber','Converted':'green','Lost':'red',
+    'Scheduled':'amber','Done':'green','Cancelled':'red','Rescheduled':'blue',
+    'Yes — Sent':'green','Delivered':'green','Read':'green'
+  };
+  const c = map[s]||'blue';
+  return `<span class="badge badge-${c}">${s||'—'}</span>`;
+};
+
+function renderLeadRow(r,i) {
+  const n = r['CUSTOMER NAME']||'—';
+  const proj = r['PROJECT NAME']||r['Project Name']||'';
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  return `<tr>
+    <td>${r['SR NO.']||i+1}</td>
+    <td>${r['DATE']||'—'}</td>
+    <td>${r['LEAD ID']||'—'}</td>
+    <td>${r['LEAD SOURCE']||'—'}</td>
+    <td><strong>${n}</strong></td>
+    <td>${r['CONTACT NO.']||r['CONTACT NO']||'—'}</td>
+    <td>${r['EMAIL ID']||'—'}</td>
+    <td>${proj ? `<span class="project-pill"><i class="fas fa-map-marker-alt"></i> ${proj}</span>` : '—'}</td>
+    <td>${statusBadge(r['LEAD STATUS'])}</td>
+    <td>${statusBadge(r['SITE VISIT'])}</td>
+    <td>${statusBadge(r['WHATSAPP MSG'])}</td>
+    <td>${r['FOLLOW UP DATE']||'—'}</td>
+    <td style="max-width:150px;white-space:normal">${r['FOLLOW UP NOTE']||'—'}</td>
+    <td>${r['CLIENT BUDGET']?'₹'+formatLakh(r['CLIENT BUDGET']):'—'}</td>
+    <td>${r['BUDGET RANGE']||'—'}</td>
+    <td><div class="tbl-actions">
+      ${isAdmin ? `<button class="tbl-btn" onclick="editLeadModal(${i})" title="Edit"><i class="fas fa-edit"></i></button>
+      <button class="tbl-btn danger" onclick="deleteRow('Leads',${i})" title="Delete"><i class="fas fa-trash"></i></button>` : '<span style="font-size:11px;color:var(--text-light)">—</span>'}
+    </div></td>
+  </tr>`;
+}
+
+function renderPlotRow(r,i) {
+  const size = parseFloat(r['PLOT SIZE (MARLA)']||r['Plot Size'])||0;
+  const brate = parseFloat(r['BASE RATE (PER MARLA)']||r['Base Rate'])||0;
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  return `<tr>
+    <td><strong>${r['PLOT NO.']||r['Plot No']||'—'}</strong></td>
+    <td>${r['PLOT FACING']||r['Plot Facing']||'—'}</td>
+    <td>${size||'—'}</td>
+    <td>${brate?'₹'+formatLakh(brate):'—'}</td>
+    <td>${(size&&brate)?'₹'+formatLakh(size*brate):'—'}</td>
+    <td>${statusBadge(r['PLOT STATUS']||r['Plot Status'])}</td>
+    <td>${(r['AGREED FINAL RATE PER MARLA']||r['Agreed Final Rate'])?'₹'+formatLakh(r['AGREED FINAL RATE PER MARLA']||r['Agreed Final Rate']):'—'}</td>
+    <td><div class="tbl-actions">
+      ${isAdmin ? `<button class="tbl-btn danger" onclick="deleteRow('Plots',${i})"><i class="fas fa-trash"></i></button>` : '—'}
+    </div></td>
+  </tr>`;
+}
+
+function renderFuRow(r,i) {
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  return `<tr>
+    <td><strong>${r['CUSTOMER NAME']||r['Customer Name']||'—'}</strong></td>
+    <td>${r['CONTACT NO.']||r['Contact No']||'—'}</td>
+    <td>${r['LEAD ID']||r['Lead ID']||'—'}</td>
+    <td>${r['FOLLOW UP DATE']||r['Follow Up Date']||'—'}</td>
+    <td style="max-width:180px;white-space:normal">${r['FOLLOW UP NOTE']||r['Follow Up Note']||'—'}</td>
+    <td>${r['TYPE']||r['Type']||'—'}</td>
+    <td>${statusBadge(r['STATUS']||r['Status'])}</td>
+    <td><div class="tbl-actions">
+      ${isAdmin ? `<button class="tbl-btn danger" onclick="deleteRow('Followups',${i})"><i class="fas fa-trash"></i></button>` : '—'}
+    </div></td>
+  </tr>`;
+}
+
+function renderBookingRow(r,i) {
+  const proj = r['PROJECT NAME']||r['Project Name']||'';
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  return `<tr>
+    <td><strong>${r['CUSTOMER NAME']||r['Customer Name']||'—'}</strong></td>
+    <td>${r['CONTACT NO.']||r['Contact No']||'—'}</td>
+    <td>${r['PLOT NO.']||r['Plot No']||'—'}</td>
+    <td>${r['PLOT SIZE (MARLA)']||r['Plot Size']||'—'}</td>
+    <td>${r['AGREED FINAL RATE PER MARLA']?'₹'+formatLakh(r['AGREED FINAL RATE PER MARLA']):'—'}</td>
+    <td><strong>${r['BOOKING AMOUNT']?'₹'+formatLakh(r['BOOKING AMOUNT']):'—'}</strong></td>
+    <td>${r['TOTAL AMOUNT']?'₹'+formatLakh(r['TOTAL AMOUNT']):'—'}</td>
+    <td style="color:var(--red)">${r['BALANCE AMOUNT']?'₹'+formatLakh(r['BALANCE AMOUNT']):'—'}</td>
+    <td>${statusBadge(r['PLOT STATUS']||r['Plot Status'])}</td>
+    <td>${r['DATE']||r['Date']||'—'}</td>
+    <td>${proj ? `<span class="project-pill"><i class="fas fa-map-marker-alt"></i> ${proj}</span>` : '—'}</td>
+    <td><div class="tbl-actions">
+      ${isAdmin ? `<button class="tbl-btn danger" onclick="deleteRow('Bookings',${i})"><i class="fas fa-trash"></i></button>` : '—'}
+    </div></td>
+  </tr>`;
+}
+
+function renderPaymentRow(r,i) {
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  return `<tr>
+    <td>${r['DATE']||r['Date']||'—'}</td>
+    <td><strong>${r['CUSTOMER NAME']||r['Customer Name']||'—'}</strong></td>
+    <td>${r['CONTACT NO.']||r['Contact No']||'—'}</td>
+    <td>${r['PLOT NO.']||r['Plot No']||'—'}</td>
+    <td><strong>₹${formatLakh(r['AMOUNT']||r['Amount'])}</strong></td>
+    <td>${r['PAYMENT MODE']||r['Payment Mode']||'—'}</td>
+    <td>${r['RECEIPT NO.']||r['Receipt No']||'—'}</td>
+    <td>${r['REMARKS']||r['Remarks']||'—'}</td>
+    <td><div class="tbl-actions">
+      ${isAdmin ? `<button class="tbl-btn danger" onclick="deleteRow('Payments',${i})"><i class="fas fa-trash"></i></button>` : '—'}
+    </div></td>
+  </tr>`;
+}
+
+// ═══════════════════════════════════════
+//  FORM SUBMIT
+// ═══════════════════════════════════════
+async function submitForm(type) {
+  let data = {}, sheet = '', modal = '';
+
+  if(type==='lead') {
+    data = {
+      'SR NO.': v('l_srno') || (((cache['Leads']||[]).length)+1),
+      'DATE': v('l_date'),
+      'LEAD ID': v('l_leadid'),
+      'LEAD SOURCE': v('l_source'),
+      'CUSTOMER NAME': v('l_name'),
+      'CONTACT NO.': v('l_phone'),
+      'EMAIL ID': v('l_email'),
+      'PROJECT NAME': v('l_project'),
+      'LEAD STATUS': v('l_status'),
+      'SITE VISIT': v('l_sitevisit'),
+      'WHATSAPP MSG': v('l_whatsapp'),
+      'FOLLOW UP DATE': v('l_fudate'),
+      'FOLLOW UP NOTE': v('l_funote'),
+      'CLIENT BUDGET': v('l_budget'),
+      'BUDGET RANGE': v('l_budrange')
+    };
+    if(!data['CUSTOMER NAME']){showToast('Customer Name is required','error');return;}
+    sheet='Leads'; modal='leadModal';
+
+  } else if(type==='plot') {
+    const sz = parseFloat(v('p_size'))||0;
+    const br = parseFloat(v('p_baserate'))||0;
+    data = {
+      'PLOT NO.': v('p_plotno'),
+      'PLOT FACING': v('p_facing'),
+      'PLOT SIZE (MARLA)': v('p_size'),
+      'BASE RATE (PER MARLA)': v('p_baserate'),
+      'PLOT BASE PRICE': sz&&br ? sz*br : '',
+      'PLOT STATUS': v('p_status'),
+      'AGREED FINAL RATE PER MARLA': v('p_finalrate')
+    };
+    if(!data['PLOT NO.']){showToast('Plot No. is required','error');return;}
+    sheet='Plots'; modal='plotModal';
+
+  } else if(type==='followup') {
+    data = {
+      'CUSTOMER NAME': v('fu_name'),
+      'CONTACT NO.': v('fu_phone'),
+      'LEAD ID': v('fu_leadid'),
+      'FOLLOW UP DATE': v('fu_date'),
+      'FOLLOW UP NOTE': v('fu_note'),
+      'TYPE': v('fu_type'),
+      'STATUS': v('fu_status')
+    };
+    if(!data['CUSTOMER NAME']){showToast('Customer Name is required','error');return;}
+    sheet='Followups'; modal='fuModal';
+
+  } else if(type==='booking') {
+    const sz = parseFloat(v('b_size'))||0;
+    const fr = parseFloat(v('b_finalrate'))||0;
+    const bk = parseFloat(v('b_booking'))||0;
+    const total = sz*fr;
+    data = {
+      'CUSTOMER NAME': v('b_name'),
+      'CONTACT NO.': v('b_phone'),
+      'PLOT NO.': v('b_plotno'),
+      'PLOT SIZE (MARLA)': v('b_size'),
+      'AGREED FINAL RATE PER MARLA': v('b_finalrate'),
+      'BOOKING AMOUNT': v('b_booking'),
+      'TOTAL AMOUNT': total||'',
+      'BALANCE AMOUNT': total ? total-bk : '',
+      'PLOT STATUS': v('b_status'),
+      'DATE': v('b_date'),
+      'PROJECT NAME': v('b_project')
+    };
+    if(!data['CUSTOMER NAME']||!data['PLOT NO.']){showToast('Customer Name & Plot No. required','error');return;}
+    sheet='Bookings'; modal='bookingModal';
+
+  } else if(type==='payment') {
+    data = {
+      'DATE': v('pay_date'),
+      'CUSTOMER NAME': v('pay_name'),
+      'CONTACT NO.': v('pay_phone'),
+      'PLOT NO.': v('pay_plot'),
+      'AMOUNT': v('pay_amount'),
+      'PAYMENT MODE': v('pay_mode'),
+      'RECEIPT NO.': v('pay_receipt'),
+      'REMARKS': v('pay_remarks')
+    };
+    if(!data['CUSTOMER NAME']||!data['AMOUNT']){showToast('Customer Name & Amount required','error');return;}
+    sheet='Payments'; modal='paymentModal';
+  }
+
+  const btn = document.querySelector(`#${modal} .btn-submit`);
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Saving...';
+  const ok = await postToSheet(sheet, data);
+  btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> Save';
+  if(ok) {
+    showToast(`Saved to ${sheet} successfully!`,'success');
+    closeModal(modal);
+    delete cache[sheet];
+    const pgMap = {Leads:'leads',Plots:'plots',Followups:'followups',Bookings:'bookings',Payments:'payments'};
+    if(pgMap[sheet]) loadPageData(pgMap[sheet]);
+    if(document.getElementById('page-dashboard').classList.contains('active')) loadDashboard();
+  }
+}
+
+// ═══════════════════════════════════════
+//  BOOKING AUTO-CALC
+// ═══════════════════════════════════════
+function calcBookingTotal() {
+  const sz = parseFloat(document.getElementById('b_size')?.value)||0;
+  const fr = parseFloat(document.getElementById('b_finalrate')?.value)||0;
+  const bk = parseFloat(document.getElementById('b_booking')?.value)||0;
+  const total = sz*fr;
+  if(document.getElementById('b_total')) document.getElementById('b_total').value = total||'';
+  if(document.getElementById('b_balance')) document.getElementById('b_balance').value = total ? total-bk : '';
+}
+
+// ═══════════════════════════════════════
+//  EDIT LEAD
+// ═══════════════════════════════════════
+function editLeadModal(i) {
+  const r = cache['Leads']?.[i];
+  if(!r) return;
+  document.getElementById('l_srno').value = r['SR NO.']||'';
+  document.getElementById('l_date').value = r['DATE']||'';
+  document.getElementById('l_leadid').value = r['LEAD ID']||'';
+  document.getElementById('l_source').value = r['LEAD SOURCE']||'';
+  document.getElementById('l_project').value = r['PROJECT NAME']||r['Project Name']||'';
+  document.getElementById('l_name').value = r['CUSTOMER NAME']||'';
+  document.getElementById('l_phone').value = r['CONTACT NO.']||r['CONTACT NO']||'';
+  document.getElementById('l_email').value = r['EMAIL ID']||'';
+  document.getElementById('l_status').value = r['LEAD STATUS']||'New Lead';
+  document.getElementById('l_sitevisit').value = r['SITE VISIT']||'No';
+  document.getElementById('l_whatsapp').value = r['WHATSAPP MSG']||'No';
+  document.getElementById('l_fudate').value = r['FOLLOW UP DATE']||'';
+  document.getElementById('l_funote').value = r['FOLLOW UP NOTE']||'';
+  document.getElementById('l_budget').value = r['CLIENT BUDGET']||'';
+  document.getElementById('l_budrange').value = r['BUDGET RANGE']||'';
+  openModal('leadModal');
+}
+
+// ═══════════════════════════════════════
+//  DELETE
+// ═══════════════════════════════════════
+async function deleteRow(sheet, rowIndex) {
+  if(!confirm('Are you sure you want to delete this row?')) return;
+  const data = cache[sheet];
+  if(!data) return;
+  // rowIndex is 0-based array index from cache; backend adds DATA_START offset
+  const ok = await postToSheet(sheet, { rowIndex: rowIndex }, 'delete');
+  if(ok) {
+    showToast('Deleted successfully','success');
+    delete cache[sheet];
+    loadPageData(document.querySelector('.nav-item.active')?.dataset.page);
+  }
+}
+
+// ═══════════════════════════════════════
+//  FILTER LEADS
+// ═══════════════════════════════════════
+function filterLeads() {
+  const q = document.getElementById('leadSearch')?.value.toLowerCase()||'';
+  const sf = document.getElementById('leadStatusFilter')?.value||'';
+  const pf = document.getElementById('leadProjectFilter')?.value||'';
+  document.querySelectorAll('#leadTable tr').forEach(tr => {
+    const txt = tr.textContent.toLowerCase();
+    const match = (!q || txt.includes(q)) && (!sf || txt.includes(sf.toLowerCase())) && (!pf || txt.includes(pf.toLowerCase()));
+    tr.style.display = match ? '' : 'none';
+  });
+}
+function filterPlots() {
+  const sf = document.getElementById('plotStatusFilter')?.value||'';
+  const pf = document.getElementById('plotProjectFilter')?.value||'';
+  document.querySelectorAll('#plotTable tr').forEach(tr => {
+    tr.style.display = (!sf || tr.textContent.includes(sf)) && (!pf || tr.textContent.includes(pf)) ? '' : 'none';
+  });
+}
+
+// ═══════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════
+async function saveSettings() {
+  const url = document.getElementById('sheetsUrl').value.trim();
+  if(!url){showToast('Please enter a URL','error');return;}
+  SHEET_URL = url;
+  const ok = await testConnection();
+  if(ok) localStorage.setItem('ga_sheet_url', url);
+}
+
+async function testConnection() {
+  const url = document.getElementById('sheetsUrl').value.trim();
+  if(!url){showToast('Enter URL first','error');return false;}
+  SHEET_URL = url;
+  const badge = document.getElementById('apiStatusBadge');
+  badge.className='api-status checking'; badge.innerHTML='<i class="fas fa-spinner fa-spin"></i> Testing...';
+  const data = await fetchSheet('Leads');
+  if(Array.isArray(data)) {
+    badge.className='api-status connected'; badge.innerHTML='<i class="fas fa-check-circle"></i> Connected!';
+    showToast('Google Sheets connected successfully!','success');
+    return true;
+  } else {
+    badge.className='api-status disconnected'; badge.innerHTML='<i class="fas fa-times-circle"></i> Failed';
+    showToast('Connection failed — check URL and sharing settings','error');
+    return false;
+  }
+}
+
+function saveCompanyInfo() {
+  localStorage.setItem('ga_comp_name', document.getElementById('compName').value);
+  localStorage.setItem('ga_admin_name', document.getElementById('adminName').value);
+  showToast('Company info saved!','success');
+}
+
+function copyScript() {
+  const script = `// ══════════════════════════════════════════════════════════════
+// GOLDEN ACRE CRM — Google Apps Script  (FIXED v2)
+// ──────────────────────────────────────────────────────────────
+// Steps:
+//  1. Open your Google Sheet
+//  2. Extensions > Apps Script  →  paste this entire file
+//  3. Deploy > New Deployment > Web App
+//     Execute as: Me  |  Who has access: Anyone
+//  4. Copy the Web App URL → paste in Dashboard Settings
+//
+// Sheet layout this script expects:
+//   Row 1 = Company title (merged, styled)
+//   Row 2 = Subtitle
+//   Row 3 = Column headers  ← HEADER_ROW
+//   Row 4+ = Actual data    ← DATA_START
+// ══════════════════════════════════════════════════════════════
+
+var HEADER_ROW = 3;
+var DATA_START = 4;
+
+function doGet(e) {
+  try {
+    var sheetName = (e.parameter && e.parameter.sheet) ? e.parameter.sheet : 'Leads';
+    var callback  = (e.parameter && e.parameter.callback) ? e.parameter.callback : null;
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ws = ss.getSheetByName(sheetName);
+    if (!ws) return respond({ error: 'Sheet not found: ' + sheetName }, callback);
+
+    var lastRow = ws.getLastRow();
+    var lastCol = ws.getLastColumn();
+    if (lastRow < DATA_START || lastCol < 1) return respond([], callback);
+
+    var headers  = ws.getRange(HEADER_ROW, 1, 1, lastCol).getValues()[0];
+    var numRows  = lastRow - DATA_START + 1;
+    var rawData  = ws.getRange(DATA_START, 1, numRows, lastCol).getValues();
+
+    var rows = [];
+    for (var i = 0; i < rawData.length; i++) {
+      var row = rawData[i];
+      if (row[0] === '' || row[0] === null) continue;
+      var obj = { _rowIndex: i };
+      for (var j = 0; j < headers.length; j++) {
+        var key = headers[j] ? String(headers[j]).trim() : 'COL_' + (j+1);
+        var val = row[j];
+        if (val instanceof Date) {
+          val = Utilities.formatDate(val, Session.getScriptTimeZone(), 'dd/MM/yyyy');
+        } else {
+          val = (val !== undefined && val !== null) ? String(val) : '';
+        }
+        obj[key] = val;
+      }
+      rows.push(obj);
+    }
+    return respond(rows, callback);
+  } catch(err) {
+    var cb = (e && e.parameter && e.parameter.callback) ? e.parameter.callback : null;
+    return respond({ error: err.message }, cb);
+  }
+}
+
+function doPost(e) {
+  var callback = null;
+  try {
+    callback = (e.parameter && e.parameter.callback) ? e.parameter.callback : null;
+    var body = JSON.parse(e.postData.contents);
+    var ss   = SpreadsheetApp.getActiveSpreadsheet();
+
+    if (body.action === 'delete') {
+      var ws = ss.getSheetByName(body.sheet);
+      if (!ws) return respond({ success: false, error: 'Sheet not found' }, callback);
+      var sheetRow = DATA_START + parseInt(body.data.rowIndex);
+      if (sheetRow < DATA_START || sheetRow > ws.getLastRow())
+        return respond({ success: false, error: 'Invalid row' }, callback);
+      ws.deleteRow(sheetRow);
+      return respond({ success: true }, callback);
+    }
+
+    var ws = ss.getSheetByName(body.sheet);
+    if (!ws) ws = ss.insertSheet(body.sheet);
+    var lastCol = ws.getLastColumn();
+    var headers = lastCol > 0
+      ? ws.getRange(HEADER_ROW, 1, 1, lastCol).getValues()[0].map(String)
+      : Object.keys(body.data);
+    var newRow = headers.map(function(h) {
+      var v = body.data[h.trim()];
+      return (v !== undefined && v !== null) ? v : '';
+    });
+    ws.appendRow(newRow);
+    SpreadsheetApp.flush();
+    return respond({ success: true }, callback);
+  } catch(err) {
+    return respond({ success: false, error: err.message }, callback);
+  }
+}
+
+function respond(data, callback) {
+  var json   = JSON.stringify(data);
+  var output = callback ? (callback + '(' + json + ')') : json;
+  return ContentService.createTextOutput(output)
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
+}`;
+  document.getElementById('scriptCode').textContent = script;
+  const box = document.getElementById('scriptBox');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  navigator.clipboard.writeText(script)
+    .then(()=>showToast('Apps Script code copied! Paste it in Apps Script editor.','success'))
+    .catch(()=>showToast('Script shown below — copy manually.',''));
+}
+
+// ═══════════════════════════════════════
+//  MODAL HELPERS
+// ═══════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+});
+
+// ═══════════════════════════════════════
+//  TABLE FILTER
+// ═══════════════════════════════════════
+function filterTable(tbodyId, inputId) {
+  const q = document.getElementById(inputId).value.toLowerCase();
+  document.querySelectorAll(`#${tbodyId} tr`).forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ═══════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════
+function v(id) { return (document.getElementById(id)?.value||'').trim(); }
+function initials(name) { return (name||'??').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+function formatLakh(n) {
+  const num = parseFloat(n)||0;
+  if(num>=10000000) return (num/10000000).toFixed(2)+' Cr';
+  if(num>=100000) return (num/100000).toFixed(2)+' L';
+  return num.toLocaleString('en-IN');
+}
+function showConfigBanner() { const b=document.getElementById('configBanner'); if(b) b.style.display='flex'; }
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast '+(type||'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+async function refreshAll() {
+  cache = {};
+  const pg = document.querySelector('.nav-item.active')?.dataset.page||'dashboard';
+  showToast('Refreshing...','');
+  await loadPageData(pg);
+  showToast('Data updated!','success');
+}
+</script>
+</body>
+</html>
